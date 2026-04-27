@@ -1,4 +1,4 @@
-# RESQ FastAPI — Option A: Django-Compatible Conversion
+# RESQ FastAPI
 
 This package follows the GitHub repo structure and behavior as closely as possible:
 
