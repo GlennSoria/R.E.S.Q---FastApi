@@ -16,7 +16,7 @@ Use Python 3.11.
 
 ```powershell
 py -3.11 -m venv .venv
-.venv\Scriptsctivate
+.venv\Scripts\Activate
 python -m pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 copy .env.example .env
