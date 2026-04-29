@@ -118,6 +118,13 @@ $response = Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/auth/login/" `
 $token = $response.token
 ```
 
+### Logout
+
+``powershell
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/auth/logout/" `
+-Method POST `
+-Headers @{ Authorization = "Token $token" }
+
 ### Profile
 
 ```powershell

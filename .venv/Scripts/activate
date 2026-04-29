@@ -35,7 +35,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Zynogen\Downloads\option_a_resq_fastapi_django_compatible\.venv"
+VIRTUAL_ENV="C:\Users\glenn\Desktop\RESQ\R.E.S.Q---FastApi\.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

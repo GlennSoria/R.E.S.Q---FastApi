@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi import Header, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from ..database import get_db
@@ -19,12 +20,17 @@ def get_or_create_profile(db: Session, user: AuthUser) -> UserProfile:
     db.add(profile); db.commit(); db.refresh(profile)
     return profile
 
-def get_or_create_token(db: Session, user: AuthUser) -> AuthToken:
-    existing = db.query(AuthToken).filter(AuthToken.user_id == user.id).first()
-    if existing:
-        return existing
+def create_new_token(db: Session, user: AuthUser) -> AuthToken:
+    # Delete old token/s of this user
+    db.query(AuthToken).filter(AuthToken.user_id == user.id).delete()
+    db.commit()
+
+    # Create fresh token
     token = AuthToken(key=make_token(), user_id=user.id)
-    db.add(token); db.commit(); db.refresh(token)
+    db.add(token)
+    db.commit()
+    db.refresh(token)
+
     return token
 
 @router.post("/register/", response_model=AuthResponse, status_code=201)
@@ -54,9 +60,37 @@ def login(data: LoginIn, db: Session = Depends(get_db)):
     if not user or not verify_django_password(data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials.")
     profile = get_or_create_profile(db, user)
-    token = get_or_create_token(db, user)
+    token = create_new_token(db, user)
     return AuthResponse(message="Login successful.", token=token.key, user=profile_out(profile))
 
 @router.get("/profile/", response_model=UserProfileOut)
 def profile(user: AuthUser = Depends(get_current_user), db: Session = Depends(get_db)):
     return profile_out(get_or_create_profile(db, user))
+
+@router.post("/logout/")
+def logout(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    authorization = request.headers.get("Authorization")
+
+    if not authorization:
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication credentials were not provided."
+        )
+
+    if authorization.startswith("Token "):
+        key = authorization.split(" ", 1)[1].strip()
+    else:
+        key = authorization.strip()
+
+    token = db.query(AuthToken).filter(AuthToken.key == key).first()
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Invalid token.")
+
+    db.delete(token)
+    db.commit()
+
+    return {"message": "Logout successful. Token deleted."}

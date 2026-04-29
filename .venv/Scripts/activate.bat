@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\Zynogen\Downloads\option_a_resq_fastapi_django_compatible\.venv
+set VIRTUAL_ENV=C:\Users\glenn\Desktop\RESQ\R.E.S.Q---FastApi\.venv
 
 if not defined PROMPT set PROMPT=$P$G
 
